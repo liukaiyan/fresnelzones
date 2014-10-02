@@ -2,6 +2,7 @@ from pylab import *
 from math import *
 from numpy import arange
 
+
 class Fresnel:
     # HoleRadius > x > HoleRadius^2 / WaveLength
 
