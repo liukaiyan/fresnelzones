@@ -3,6 +3,7 @@ from pylab import axes
 from numpy import arange
 from matplotlib.widgets import Slider
 
+
 def show(model):
     spiral_x = []
     spiral_y = []

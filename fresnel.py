@@ -42,14 +42,14 @@ class Fresnel:
             distance = self.observer_distance + phi * half_lambda / pi
             #phi = 2*pi*(L - x) / WaveLength
 
-            alpha = arcsin(self.observer_distance / distance)
+            #alpha = arcsin(self.observer_distance / distance)
             amp = self.initial_intensity / distance
 
             #phi_lambda = phi * WaveLength
             #amp = amp * (pi / ((sqrt (abs (phi_lambda * (pi_x_4 - phi_lambda)))) * (4*pi*x*WaveLength - 2*phi*WaveLength*WaveLength) / 4*pi*pi))
             #amp = amp * deltaAngle
 
-            r = sqrt(distance**2 - self.observer_distance**2)
+            #r = sqrt(distance**2 - self.observer_distance**2)
             #dr = r - pr
             #amp = 1 / n
             #pr = r
