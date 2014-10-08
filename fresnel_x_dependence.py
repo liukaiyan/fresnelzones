@@ -3,7 +3,7 @@ import matplotlib.pyplot as plot
 from numpy import arange
 
 lowest = 500
-highest = 10000
+highest = 60000
 default = 2000
 step = 100
 
@@ -14,6 +14,7 @@ def show(model):
         model.observer_distance = distance
         intensities.append(model.calculate_intensity())
 
+    model.observer_distance = default
     figure = plot.figure(1)
     plot.subplots_adjust(left=0.15, bottom=0.3)
 

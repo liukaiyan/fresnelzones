@@ -3,7 +3,7 @@ import matplotlib.pyplot as plot
 from numpy import arange
 
 lowest = 10
-highest = 20000
+highest = 150000
 default = 3000
 step = 400
 

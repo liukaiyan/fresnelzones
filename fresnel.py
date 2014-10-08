@@ -9,10 +9,11 @@ class Fresnel:
     def __init__(self,
                  initial_intensity=1,
                  wave_length=400,
-                 hole_radius=3000,
+                 hole_radius=2000,
                  observer_distance=10000):
         self.initial_intensity = initial_intensity
         self.wave_length = wave_length
+        self.k = 2 * pi / wave_length
         self.hole_radius = hole_radius
         self.observer_distance = observer_distance
 
@@ -20,6 +21,38 @@ class Fresnel:
         (rx, ry) = self.calculate_amplitude(theta)
         return (rx*rx + ry*ry) * 3*10**8 / (8*pi)
 
+    def calculate_amplitude(self, theta=+inf):
+        amp_re = 0
+        amp_im = 0
+        delta_r = 10
+        n = self.hole_radius / delta_r
+        x2 = self.observer_distance**2
+
+        for i in arange(0, n, 1):
+            r = i * delta_r
+            d = sqrt(r**2 + x2)
+            P = 1 / d
+
+            if theta != +inf:
+                phase = (d - self.observer_distance) / self.wave_length * 2 * pi
+                print (phase, theta)
+                if phase > theta:
+                    print ('bb')
+                    break
+
+            P *= 1 + self.observer_distance / d # K
+            P *= r
+            arg = -self.k * d
+            amp_re += -P * sin(arg)
+            amp_im += P * cos(arg)
+
+        k = pi / self.wave_length * self.initial_intensity * self.hole_radius / n
+        amp_re *= k
+        amp_im *= k
+
+        return amp_re, amp_im
+
+    """
     def calculate_amplitude(self, theta=+inf):
         n = 100
 
@@ -66,12 +99,13 @@ class Fresnel:
             #r = r + deltaR
 
         return summ_x, summ_y
+    """
 
     def calculate_spiral(self, spiral_x, spiral_y):
+
         for theta in arange(0.0, 8.0*pi, 0.4):
             (rx, ry) = self.calculate_amplitude(theta)
-            spiral_x.append(rx * 1000)
-            spiral_y.append(ry * 1000)
-
-    def get_k(self, alpha):
-        return cos (alpha)
+            #(rx, ry) = 0, 0
+            spiral_x.append(ry)
+            spiral_y.append(rx)
+            print(rx, ry)
