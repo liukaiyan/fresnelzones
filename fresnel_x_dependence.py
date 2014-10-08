@@ -2,24 +2,23 @@ import fresnel_spiral
 import matplotlib.pyplot as plot
 from numpy import arange
 
-lowest = 500
-highest = 60000
-default = 2000
-step = 100
+lowest = 0.10e+3
+highest = 30e+3
+default = 5e+3
+step = 0.10e+3
 
 def show(model):
     observer_destances = arange(lowest, highest, step)
+    current_distance = model.observer_distance
     intensities = []
     for distance in observer_destances:
         model.observer_distance = distance
         intensities.append(model.calculate_intensity())
 
-    model.observer_distance = default
+    model.observer_distance = current_distance
     figure = plot.figure(1)
     plot.subplots_adjust(left=0.15, bottom=0.3)
-
     plot.subplot2grid((1, 3), (0, 0), colspan=2)
-    #plt.subplot (121)
 
     plot.title('Зависимость интенсивности от расстояния до отверстия')
     plot.xlabel('Расстояние до отверстия (нм)')

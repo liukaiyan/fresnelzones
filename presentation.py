@@ -91,7 +91,7 @@ def _x_dependence():
     model.widget_set.add_slider('Расстояние до отверсия (х)',
                                 fresnel_x_dependence.lowest,
                                 fresnel_x_dependence.highest,
-                                fresnel_x_dependence.default,
+                                model.observer_distance,
                                 model.widget_set.update_distance)
     fresnel_x_dependence.show(model)
 
@@ -101,8 +101,8 @@ def _r_dependence():
     model.widget_set.add_slider('Радиус отверсия (х)',
                                 fresnel_r_dependence.lowest,
                                 fresnel_r_dependence.highest,
-                                fresnel_r_dependence.default,
-                                model.widget_set.update_distance)
+                                model.hole_radius,
+                                model.widget_set.update_radius)
     fresnel_r_dependence.show(model)
 
 x_dependence_button = tk.Button(master=root, text='Зависимость от расстояния до отверстия', command=_x_dependence)
