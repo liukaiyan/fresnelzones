@@ -1,4 +1,5 @@
-from pylab import *
+from scipy.integrate import quad
+import filon
 from math import *
 from numpy import arange
 
@@ -7,7 +8,7 @@ class Fresnel:
     # HoleRadius > x > HoleRadius^2 / WaveLength
 
     def __init__(self,
-                 initial_intensity=1,
+                 initial_intensity=100,
                  wave_length=500e-6,
                  hole_radius=5,
                  observer_distance=6.72e+3):
@@ -19,12 +20,12 @@ class Fresnel:
 
     def calculate_intensity(self):
         (rx, ry) = self.calculate_amplitude()
-        return (rx*rx + ry*ry) * 3*10**8 / (8*pi)
+        return (rx*rx + ry*ry) * 3e+11 / (8*pi)
 
     def calculate_amplitude(self):
         return self.calculate_partial_amplitude(True, 0, self.hole_radius)
 
-    def calculate_partial_amplitude(self, parting, inner_r, outer_r):
+    def calculate_partial_amplitude_old(self, parting, inner_r, outer_r):
         amp_re = 0
         amp_im = 0
         if parting:
@@ -54,6 +55,39 @@ class Fresnel:
         amp_im *= k
 
         return amp_re, amp_im
+
+    def calculate_partial_amplitude(self, parting, inner_r, outer_r):
+        #return self.calculate_accurate_partial_amplitude(parting, inner_r, outer_r);
+        return quad(self.amplitude_re, inner_r, outer_r)[0], quad(self.amplitude_im, inner_r, outer_r)[0]
+
+    def calculate_accurate_partial_amplitude(self, parting, inner_r, outer_r):
+        re, im = 0, 0
+        r = inner_r
+        delta_r = 0.2
+        if outer_r < 2:
+            return quad(self.amplitude_re, inner_r, outer_r)[0], quad(self.amplitude_im, inner_r, outer_r)[0]
+
+        while r + delta_r < outer_r:
+            re += quad(self.amplitude_re, r, r + delta_r)[0]
+            im += quad(self.amplitude_im, r, r + delta_r)[0]
+            r += delta_r
+
+        re += quad(self.amplitude_re, r, outer_r)[0]
+        im += quad(self.amplitude_im, r, outer_r)[0]
+        return re, im
+
+    def amplitude_re(self, r):
+        d = sqrt(r**2 + self.observer_distance**2)
+        return -pi / self.wave_length * self.initial_intensity\
+               * sin(-self.k * d) / d * r * (self.observer_distance / d + 1)
+
+    def amplitude_im(self, r):
+        d = sqrt(r**2 + self.observer_distance**2)
+        return pi / self.wave_length * self.initial_intensity\
+               * cos(-self.k * d) / d * r * (self.observer_distance / d + 1)
+
+    def get_zone_outer_radius(self, n):
+        return sqrt((n + 1) * self.wave_length * self.observer_distance)
 
     """
     def calculate_amplitude(self, theta=+inf):
@@ -108,7 +142,7 @@ class Fresnel:
         spiral_x.append(0)
         spiral_y.append(0)
         re, im = 0, 0
-        delta_r = self.hole_radius / 1000
+        delta_r = 0.005#self.hole_radius / 1000
         for inner_r in arange(0, self.hole_radius, delta_r):
             (r, i) = self.calculate_partial_amplitude(False, inner_r, inner_r + delta_r)
             re += r
