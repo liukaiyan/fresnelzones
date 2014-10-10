@@ -10,13 +10,15 @@ class Fresnel:
     def __init__(self,
                  initial_intensity=100,
                  wave_length=500e-6,
-                 hole_radius=5,
-                 observer_distance=6.72e+3):
+                 hole_radius=4,
+                 observer_distance=6.72e+3,
+                 source_distance=5):
         self.initial_intensity = initial_intensity
         self.wave_length = wave_length
         self.k = 2 * pi / wave_length
         self.hole_radius = hole_radius
         self.observer_distance = observer_distance
+        self.source_distance = source_distance
 
     def calculate_intensity(self):
         (rx, ry) = self.calculate_amplitude()
@@ -76,15 +78,21 @@ class Fresnel:
         im += quad(self.amplitude_im, r, outer_r)[0]
         return re, im
 
+    def get_fresnel_number(self):
+        return (self.hole_radius**2
+                / (self.wave_length * self.observer_distance))
+
     def amplitude_re(self, r):
-        d = sqrt(r**2 + self.observer_distance**2)
-        return -pi / self.wave_length * self.initial_intensity\
-               * sin(-self.k * d) / d * r * (self.observer_distance / d + 1)
+        return -self.amplitude(r, sin)
 
     def amplitude_im(self, r):
+        return self.amplitude(r, cos)
+
+    def amplitude(self, r, trig_f):
         d = sqrt(r**2 + self.observer_distance**2)
-        return pi / self.wave_length * self.initial_intensity\
-               * cos(-self.k * d) / d * r * (self.observer_distance / d + 1)
+        phi = atan(r / self.source_distance) + atan(r / self.observer_distance)
+        return (pi / self.wave_length * self.initial_intensity *
+                trig_f(-self.k * (d - self.observer_distance)) / d * r * (cos(phi) + 1))
 
     def get_zone_outer_radius(self, n):
         return sqrt((n + 1) * self.wave_length * self.observer_distance)
@@ -141,11 +149,20 @@ class Fresnel:
     def calculate_spiral(self, spiral_x, spiral_y):
         spiral_x.append(0)
         spiral_y.append(0)
-        re, im = 0, 0
-        delta_r = 0.005#self.hole_radius / 1000
-        for inner_r in arange(0, self.hole_radius, delta_r):
-            (r, i) = self.calculate_partial_amplitude(False, inner_r, inner_r + delta_r)
-            re += r
-            im += i
-            spiral_x.append(im)
-            spiral_y.append(re)
+        re, im, inner_r = 0, 0, 0
+        nf = self.get_fresnel_number()
+        for n in arange(0, nf, 1):
+            outer_r = self.get_zone_outer_radius(n)
+            delta_r = (outer_r - inner_r) / 10
+
+            for inner_r in arange(inner_r, outer_r, delta_r):
+                if inner_r >= self.hole_radius:
+                    break
+
+                (r, i) = self.calculate_partial_amplitude(False, inner_r, inner_r + delta_r)
+                re += r
+                im += i
+                spiral_x.append(im)
+                spiral_y.append(re)
+
+            inner_r = outer_r

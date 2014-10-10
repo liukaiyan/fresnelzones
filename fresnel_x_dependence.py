@@ -2,8 +2,8 @@ import fresnel_spiral
 import matplotlib.pyplot as plot
 from numpy import arange
 
-lowest = 0.10e+3
-highest = 30e+3
+lowest = 1e+3
+highest = 100e+3
 default = 5e+3
 step = 0.10e+3
 
@@ -21,7 +21,7 @@ def show(model):
     plot.subplot2grid((1, 3), (0, 0), colspan=2)
 
     plot.title('Зависимость интенсивности от расстояния до отверстия')
-    plot.xlabel('Расстояние до отверстия (нм)')
+    plot.xlabel('Расстояние до отверстия (мм)')
     plot.ylabel('Интенсивность (Вт/м2)')
     plot.grid(True)
 

@@ -24,17 +24,17 @@ def show(model):
         zone_radius = model.get_zone_outer_radius(n)
         n += 1
 
-
     model.hole_radius = current_hole_radius
     figure = plot.figure(1)
     plot.subplots_adjust(left=0.15, bottom=0.3)
     plot.subplot2grid((1, 3), (0, 0), colspan=2)
 
     plot.title('Зависимость интенсивности от радиуса отверстия')
-    plot.xlabel('Радиус отверстия (нм)')
+    plot.xlabel('Радиус отверстия (мм)')
     plot.ylabel('Интенсивность (Вт/м2)')
     plot.grid(True)
 
+    print(len(zone_radiuses))
     for zone_radius in zone_radiuses:
         plot.axvline(zone_radius, 0, model.initial_intensity, color='r')
 
