@@ -10,7 +10,7 @@ class Fresnel:
     def __init__(self,
                  initial_intensity=100,
                  wave_length=500e-6,
-                 hole_radius=4,
+                 hole_radius=1,
                  observer_distance=6.72e+3,
                  source_distance=5):
         self.initial_intensity = initial_intensity
@@ -78,10 +78,6 @@ class Fresnel:
         im += quad(self.amplitude_im, r, outer_r)[0]
         return re, im
 
-    def get_fresnel_number(self):
-        return (self.hole_radius**2
-                / (self.wave_length * self.observer_distance))
-
     def amplitude_re(self, r):
         return -self.amplitude(r, sin)
 
@@ -89,14 +85,28 @@ class Fresnel:
         return self.amplitude(r, cos)
 
     def amplitude(self, r, trig_f):
-        d = sqrt(r**2 + self.observer_distance**2)
-        phi = atan(r / self.source_distance) + atan(r / self.observer_distance)
-        return (pi / self.wave_length * self.initial_intensity *
-                trig_f(-self.k * (d - self.observer_distance)) / d * r * (cos(phi) + 1))
+        a = self.source_distance
+        b = self.observer_distance
+        l = self.wave_length
+        d = sqrt(r**2 + b**2)
+        ds = sqrt(r**2 + a**2)
+        phi = atan(r / a) + atan(r / a)
+        return (pi / l * self.initial_intensity *
+                trig_f(-self.k * (ds + d - b)) / d / ds * r * (cos(phi) + 1))
 
     def get_zone_outer_radius(self, n):
-        return sqrt((n + 1) * self.wave_length * self.observer_distance)
+        a = self.source_distance
+        b = self.observer_distance
+        l = self.wave_length
+        return sqrt((n + 1) * l * a * b / (a + b))
 
+
+    def get_fresnel_number(self):
+        a = self.source_distance
+        b = self.observer_distance
+        l = self.wave_length
+        r = self.hole_radius
+        return r**2 * (a + b) / (l * a * b)
     """
     def calculate_amplitude(self, theta=+inf):
         n = 100

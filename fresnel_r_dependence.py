@@ -2,10 +2,10 @@ import fresnel_spiral
 import matplotlib.pyplot as plot
 from numpy import arange
 
-lowest = 0.1
-highest = 20
-default = 5
-step = 0.01
+lowest = 0.001
+highest = 0.5
+default = 1
+step = 0.001
 
 
 def show(model):
@@ -15,7 +15,9 @@ def show(model):
     for radius in hole_radiuses:
         model.hole_radius = radius
         intensities.append(model.calculate_intensity())
+        print(highest - radius)
 
+    print('i')
     zone_radiuses = []
     zone_radius = 0
     n = 0
@@ -39,6 +41,6 @@ def show(model):
         plot.axvline(zone_radius, 0, model.initial_intensity, color='r')
 
     plot.plot(hole_radiuses, intensities, linewidth=2)
-    fresnel_spiral.show(model)
+    #fresnel_spiral.show(model)
 
     model.draw(figure)
