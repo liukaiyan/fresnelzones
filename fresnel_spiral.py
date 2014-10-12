@@ -16,15 +16,15 @@ def show(model):
     plot.ylabel('Im(E)')
 
     #d = sqrt((spiral_x[1] - spiral_x[0])**2 + (spiral_y[1] - spiral_y[0])**2)
-    d = 10
+    d = 0.01
     w = d / 3
     h_w = w * 2
     h_l = d / 3
 
-    #plot.plot(spiral_x, spiral_y, color='r', linewidth=2)
-    for i in arange(0, len(spiral_x) - 1, 1):
-        plot.arrow(spiral_x[i], spiral_y[i], spiral_x[i + 1] - spiral_x[i], spiral_y[i + 1] - spiral_y[i],
-        width=w, head_width=h_w, head_length=h_l, length_includes_head=True, fc='r', ec='k')
+    plot.plot(spiral_x, spiral_y, color='r', linewidth=2)
+    #for i in arange(0, len(spiral_x) - 1, 1):
+    #    plot.arrow(spiral_x[i], spiral_y[i], spiral_x[i + 1] - spiral_x[i], spiral_y[i + 1] - spiral_y[i],
+    #    width=w, head_width=h_w, head_length=h_l, length_includes_head=True, fc='r', ec='k')
 
     plot.arrow(0, 0, spiral_x[-1], spiral_y[-1],
                width=w*1.5, head_width=h_w*1.5, head_length=h_l*1.5, length_includes_head=True, fc='g', ec='k')

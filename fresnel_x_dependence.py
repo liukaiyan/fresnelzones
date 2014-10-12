@@ -2,10 +2,10 @@ import fresnel_spiral
 import matplotlib.pyplot as plot
 from numpy import arange
 
-lowest = 1e+3
-highest = 100e+3
-default = 5e+3
-step = 0.10e+3
+lowest = 0.05
+highest = 1
+default = 0.5
+step = 0.001
 
 def show(model):
     observer_destances = arange(lowest, highest, step)

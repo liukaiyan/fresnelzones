@@ -10,9 +10,9 @@ class Fresnel:
     def __init__(self,
                  initial_intensity=100,
                  wave_length=500e-6,
-                 hole_radius=1,
-                 observer_distance=6.72e+3,
-                 source_distance=5):
+                 hole_radius=0.01,
+                 observer_distance=0.5,
+                 source_distance=0.05):
         self.initial_intensity = initial_intensity
         self.wave_length = wave_length
         self.k = 2 * pi / wave_length
