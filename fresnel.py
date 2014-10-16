@@ -90,23 +90,32 @@ class Fresnel:
         l = self.wave_length
         d = sqrt(r**2 + b**2)
         ds = sqrt(r**2 + a**2)
+        phi = atan(r / a) + atan(r / b)
+        return (pi / l * self.initial_intensity *
+                trig_f(-self.k * (d - b)) / d * r * (cos(phi) + 1))
+
+    def amplitude_flat_waves(self, r, trig_f):
+        a = self.source_distance
+        b = self.observer_distance
+        l = self.wave_length
+        d = sqrt(r**2 + b**2)
         phi = atan(r / a) + atan(r / a)
         return (pi / l * self.initial_intensity *
                 trig_f(-self.k * (ds + d - b)) / d / ds * r * (cos(phi) + 1))
 
     def get_zone_outer_radius(self, n):
-        a = self.source_distance
+        #a = self.source_distance
         b = self.observer_distance
         l = self.wave_length
-        return sqrt((n + 1) * l * a * b / (a + b))
+        return sqrt((n + 1)**2 * l**2 / 4 + l * (n + 1) * b)
 
 
     def get_fresnel_number(self):
-        a = self.source_distance
+        #a = self.source_distance
         b = self.observer_distance
         l = self.wave_length
         r = self.hole_radius
-        return r**2 * (a + b) / (l * a * b)
+        return 2 * (-l * b**2 + sqrt(b**2 + r**2)) / l
     """
     def calculate_amplitude(self, theta=+inf):
         n = 100

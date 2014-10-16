@@ -3,7 +3,7 @@ import matplotlib.pyplot as plot
 from numpy import arange
 
 lowest = 0.0001
-highest = 0.05
+highest = 0.1
 default = 0.01
 step = 0.00005
 
