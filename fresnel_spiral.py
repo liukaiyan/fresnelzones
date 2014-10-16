@@ -28,10 +28,12 @@ def show(model):
 
     plot.arrow(0, 0, spiral_x[-1], spiral_y[-1],
                width=w*1.5, head_width=h_w*1.5, head_length=h_l*1.5, length_includes_head=True, fc='g', ec='k')
+
+
     plot.grid(True)
     mx = max(spiral_x)
     my = max(spiral_y)
-    plot.xlim([-mx - d, mx + d])
-    plot.ylim([-d, my + d])
+    #plot.xlim([-mx - d, mx + d])
+    #plot.ylim([-d, my + d])
 
     model.draw(figure)

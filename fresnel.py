@@ -20,12 +20,12 @@ class Fresnel:
         self.observer_distance = observer_distance
         self.source_distance = source_distance
 
-    def calculate_intensity(self):
-        (rx, ry) = self.calculate_amplitude()
+    def calculate_intensity(self, plate=True):
+        (rx, ry) = self.calculate_amplitude(plate)
         return (rx*rx + ry*ry) * 3e+11 / (8*pi)
 
-    def calculate_amplitude(self):
-        return self.calculate_partial_amplitude(True, 0, self.hole_radius)
+    def calculate_amplitude(self, plate=True):
+        return self.calculate_partial_amplitude(0, self.hole_radius, plate)
 
     def calculate_partial_amplitude_old(self, parting, inner_r, outer_r):
         amp_re = 0
@@ -58,9 +58,12 @@ class Fresnel:
 
         return amp_re, amp_im
 
-    def calculate_partial_amplitude(self, parting, inner_r, outer_r):
+    def calculate_partial_amplitude(self, inner_r, outer_r, plate=True):
         #return self.calculate_accurate_partial_amplitude(parting, inner_r, outer_r);
-        return quad(self.amplitude_re, inner_r, outer_r)[0], quad(self.amplitude_im, inner_r, outer_r)[0]
+        if not plate:
+            return quad(self.amplitude_re, inner_r, outer_r)[0], quad(self.amplitude_im, inner_r, outer_r)[0]
+        else:
+            return quad(self.amplitude_re_plate, inner_r, outer_r)[0], quad(self.amplitude_im_plate, inner_r, outer_r)[0]
 
     def calculate_accurate_partial_amplitude(self, parting, inner_r, outer_r):
         re, im = 0, 0
@@ -79,29 +82,42 @@ class Fresnel:
         return re, im
 
     def amplitude_re(self, r):
-        return -self.amplitude(r, sin)
+        return -self.amplitude(r, sin, False)
 
     def amplitude_im(self, r):
-        return self.amplitude(r, cos)
+        return self.amplitude(r, cos, False)
 
-    def amplitude(self, r, trig_f):
+    def amplitude_re_plate(self, r):
+        return -self.amplitude(r, sin, True)
+
+    def amplitude_im_plate(self, r):
+        return self.amplitude(r, cos, True)
+
+    def amplitude(self, r, trig_f, plate):
         a = self.source_distance
         b = self.observer_distance
         l = self.wave_length
         d = sqrt(r**2 + b**2)
-        ds = sqrt(r**2 + a**2)
+        #ds = sqrt(r**2 + a**2)
+        if plate:
+            intensity = self.amplitude_plate(r)
+        else:
+            intensity = self.initial_intensity
         phi = atan(r / a) + atan(r / b)
-        return (pi / l * self.initial_intensity *
-                trig_f(-self.k * (d - b)) / d * r * (cos(phi) + 1))
+        return (pi / l * intensity *
+                trig_f(-self.k * (d)) / d * r * (cos(phi) + 1))
 
-    def amplitude_flat_waves(self, r, trig_f):
-        a = self.source_distance
-        b = self.observer_distance
-        l = self.wave_length
-        d = sqrt(r**2 + b**2)
-        phi = atan(r / a) + atan(r / a)
-        return (pi / l * self.initial_intensity *
-                trig_f(-self.k * (ds + d - b)) / d / ds * r * (cos(phi) + 1))
+    def amplitude_plate(self, r):
+        rad = self.get_zone_outer_radius(0)
+        n = 0
+        while rad < r:
+            n += 1
+            rad = self.get_zone_outer_radius(n)
+
+        if n % 2 == 0:
+            return self.initial_intensity
+        else:
+            return 0
 
     def get_zone_outer_radius(self, n):
         #a = self.source_distance
@@ -109,13 +125,14 @@ class Fresnel:
         l = self.wave_length
         return sqrt((n + 1)**2 * l**2 / 4 + l * (n + 1) * b)
 
-
-    def get_fresnel_number(self):
+    def get_fresnel_number_r(self, r):
         #a = self.source_distance
         b = self.observer_distance
         l = self.wave_length
-        r = self.hole_radius
-        return 2 * (-l * b**2 + sqrt(b**2 + r**2)) / l
+        return int(2 * (-l * b**2 + sqrt(b**2 + r**2)) / l)
+
+    def get_fresnel_number(self):
+        return self.get_fresnel_number_r(self.hole_radius)
     """
     def calculate_amplitude(self, theta=+inf):
         n = 100
@@ -165,7 +182,7 @@ class Fresnel:
         return summ_x, summ_y
     """
 
-    def calculate_spiral(self, spiral_x, spiral_y):
+    def calculate_spiral(self, spiral_x, spiral_y, plate=True):
         spiral_x.append(0)
         spiral_y.append(0)
         re, im, inner_r = 0, 0, 0
@@ -178,7 +195,7 @@ class Fresnel:
                 if inner_r >= self.hole_radius:
                     break
 
-                (r, i) = self.calculate_partial_amplitude(False, inner_r, inner_r + delta_r)
+                (r, i) = self.calculate_partial_amplitude(inner_r, inner_r + delta_r, plate)
                 re += r
                 im += i
                 spiral_x.append(im)

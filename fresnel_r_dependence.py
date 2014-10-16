@@ -3,9 +3,9 @@ import matplotlib.pyplot as plot
 from numpy import arange
 
 lowest = 0.0001
-highest = 0.1
+highest = 0.05
 default = 0.01
-step = 0.00005
+step = 0.001
 
 
 def show(model):
@@ -40,6 +40,14 @@ def show(model):
         plot.axvline(zone_radius, 0, model.initial_intensity, color='r')
 
     plot.plot(hole_radiuses, intensities, linewidth=2)
+
+    intensities = []
+    for radius in hole_radiuses:
+        model.hole_radius = radius
+        intensities.append(model.calculate_intensity(False))
+        print(highest - radius)
+
+    plot.plot(hole_radiuses, intensities, linewidth=2, color='g')
     fresnel_spiral.show(model)
 
     model.draw(figure)
